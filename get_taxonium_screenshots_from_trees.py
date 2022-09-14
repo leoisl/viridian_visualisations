@@ -14,6 +14,17 @@ from collections import defaultdict
 from PIL import Image
 import logging
 logging.basicConfig(format='%(asctime)s %(message)s', level=logging.INFO)
+import argparse
+
+
+def get_args():
+    parser = argparse.ArgumentParser(description="Upload trees to https://taxonium.org/ and save their visualisations")
+    parser.add_argument('--gisaid_tree', required=True)
+    parser.add_argument('--viridian_tree', required=True)
+    parser.add_argument('--output_dir', required=True)
+    parser.add_argument('--small_test', action="store_true", help="Save just a small number of trees instead of all, for testing")
+    args = parser.parse_args()
+    return args
 
 
 def get_locus_to_mutation(json_filepath):
@@ -94,26 +105,29 @@ def get_gene_to_highest_position(mutations_list):
 
 
 def main():
+    args = get_args()
+
     logging.info("Getting highest position for each gene...")
-    mutations_gisaid = get_locus_to_mutation("gisaid_illumina.opt.taxonium.jsonl.gz")
-    mutations_viridian = get_locus_to_mutation("viridian_illumina.opt.taxonium.jsonl.gz")
+    mutations_gisaid = get_locus_to_mutation(args.gisaid_tree)
+    mutations_viridian = get_locus_to_mutation(args.viridian_tree)
     gene_to_highest_position = get_gene_to_highest_position([mutations_gisaid, mutations_viridian])
-    if small_test:
+
+    if args.small_test:
         gene_to_highest_position = {"ORF1b": 20}
 
     logging.info("Getting highest position for each gene - done!")
     logging.info(f"gene_to_highest_position = {gene_to_highest_position}")
 
     logging.info("Getting screenshots for gisaid...")
-    get_screenshot_from_taxonium(jsonl_file=Path("gisaid_illumina.opt.taxonium.jsonl.gz"),
-                                 screenshot_dir=Path("vis_gisaid"),
+    get_screenshot_from_taxonium(jsonl_file=Path(args.gisaid_tree),
+                                 screenshot_dir=Path(args.output_dir + "/vis_gisaid"),
                                  gene_to_highest_position=gene_to_highest_position,
                                  right_x=497, lower_y=908)
     logging.info("Getting screenshots for gisaid - done!")
 
     logging.info("Getting screenshots for viridian...")
-    get_screenshot_from_taxonium(jsonl_file=Path("viridian_illumina.opt.taxonium.jsonl.gz"),
-                                 screenshot_dir=Path("vis_viridian"),
+    get_screenshot_from_taxonium(jsonl_file=Path(args.viridian_tree),
+                                 screenshot_dir=Path(args.output_dir + "/vis_viridian"),
                                  gene_to_highest_position=gene_to_highest_position,
                                  right_x=464, lower_y=937)
     logging.info("Getting screenshots for viridian - done!")

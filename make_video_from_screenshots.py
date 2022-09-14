@@ -11,14 +11,14 @@ logging.basicConfig(format='%(asctime)s %(message)s', level=logging.INFO)
 def get_args():
     parser = argparse.ArgumentParser(description="Build a video from screenshots previously captured from get_taxonium_screenshots_from_trees.py")
 
-    parser.add_argument('--gisaid_dir')
-    parser.add_argument('--viridian_dir')
+    parser.add_argument('--gisaid_dir', required=True)
+    parser.add_argument('--viridian_dir', required=True)
     parser.add_argument('--pause_file', default=None,
                         help="Specifies a path to a file where each line specifies where and for how long to pause. "
                              "Each pause is described by one line such as: ORF1b[5] 3 to pause the video at "
                              "gene ORF1b residue 5 for 3 seconds.")
     parser.add_argument("--framerate", default=10)
-    parser.add_argument('--output_dir')
+    parser.add_argument('--output_dir', required=True)
     args = parser.parse_args()
     return args
 
