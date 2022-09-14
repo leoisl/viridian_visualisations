@@ -4,3 +4,4 @@ chromedriver
 vis_*
 user_data
 venv
+/list_images.txt
