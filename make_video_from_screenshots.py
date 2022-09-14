@@ -37,14 +37,17 @@ def get_gene_residue_from_filename(filename):
     return gene, residue
 
 
-def add_label(image, label, top_padding=50):
+def add_label(image, label, top_padding, tree_title_1, tree_title_2):
     dst = Image.new('RGB', (image.width, image.height+top_padding))
     dst.paste(image, (0, top_padding))
     draw = ImageDraw.Draw(dst)
     draw.rectangle((0, 0, image.width, top_padding), fill=(255, 255, 255), outline=(255, 255, 255))
-    font = ImageFont.truetype("resources/fonts/arial/arial.ttf", 30)
+    large_font = ImageFont.truetype("resources/fonts/arial/arial.ttf", 30)
+    small_font = ImageFont.truetype("resources/fonts/arial/arial.ttf", 18)
     gene, residue = get_gene_residue_from_filename(label)
-    draw.text((30, 10), f"{gene}[{residue}]", (0, 0, 0), size=30, font=font)
+    draw.text((30, 5), f"{gene}[{residue}]", (0, 0, 0), font=large_font)
+    draw.text((10, 60), tree_title_1, (0, 0, 0), font=small_font)
+    draw.text((image.width//2+30, 60), tree_title_2, (0, 0, 0), font=small_font)
     return dst
 
 
@@ -108,7 +111,8 @@ def main():
         png_1 = Image.open(str(file_1))
         png_2 = Image.open(str(file_2))
         concatenated_image = concatenate_horizontally(png_1, png_2)
-        labelled_image = add_label(concatenated_image, filename)
+        labelled_image = add_label(concatenated_image, filename,
+                                   top_padding=80, tree_title_1="gisaid", tree_title_2="viridian")
         labelled_image.save(combined_pngs_dir/filename)
     logging.info("Formatting original pngs - done!")
 
